@@ -200,7 +200,7 @@ public class DB {
         System.out.println("*************************");
         db.selectParking("");
         System.out.println();
-        System.out.println("TESTING SELECT BULDIND TYPE");
+        System.out.println("TESTING SELECT BUILDING TYPE");
         System.out.println("*************************");
         db.selectBuildingType("",true);
     }
