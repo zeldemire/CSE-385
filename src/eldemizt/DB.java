@@ -1,4 +1,4 @@
-package eldemizt.Model;
+package eldemizt;
 
 import java.io.IOException;
 import java.sql.*;
@@ -9,8 +9,8 @@ import java.sql.*;
  * CSE 385
  */
 public class DB {
-    String user = "";
-    String pwd = "";
+    String user = "root";
+    String pwd = "Theblood5";
     String dbURL = "jdbc:mysql://localhost:3306/Project";
     Connection conn = null;
 
@@ -41,77 +41,77 @@ public class DB {
         }
     }
 
-    protected void selectParking(String entry) {
+    protected void selectParking(String entry, boolean all) {
+        PreparedStatement statement;
         try {
             connect();
-//            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Parking WHERE Pass_type=?");
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Parking");
-//            statement.setString(1,entry);
+
+            if (all) statement = conn.prepareStatement("SELECT * FROM Parking");
+            else {
+                statement = conn.prepareStatement("SELECT * FROM Parking WHERE Pass_type=?");
+                statement.setString(1,entry);
+            }
             ResultSet rs = statement.executeQuery();
             System.out.printf("%-19s | %s | %s | %s\n", "Parking_name", "Parking_spots", "Location_id", "Pass_type");
             System.out.println("-------------------------------------------------------------");
             while (rs.next()) {
                 System.out.printf("%-19s | %13d | %11d | %9s\n", rs.getString("Parking_name"), rs.getInt("Parking_spots"), rs.getInt("Location_id"), rs.getString("Pass_type"));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    protected void selectLocation(int entry) {
+    protected void selectLocation(int entry, boolean all) {
+        PreparedStatement statement;
         try {
             connect();
-//            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location WHERE Location_id=?");
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Location");
-//            statement.setInt(1,entry);
+            if (all) statement = conn.prepareStatement("SELECT * FROM Location");
+            else {statement = conn.prepareStatement("SELECT * FROM Location WHERE Location_id=?");
+                statement.setInt(1,entry);
+            }
             ResultSet rs = statement.executeQuery();
             System.out.printf("%s | %-22s | %s | %s | %s\n", "Location_id", "Address", "Campus_name", "Quad_name", "Grid_number");
             System.out.println("----------------------------------------------------------------------------");
             while (rs.next()) {
                 System.out.printf("%-11d | %22s | %11s | %9s | %11s\n", rs.getInt("Location_id"), rs.getString("Address"), rs.getString("Campus_name"), rs.getString("Quad_name"), rs.getString("Grid_number"));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    protected void selectCampus(String entry) {
+    protected void selectCampus(String entry, boolean all) {
+        PreparedStatement statement;
         try {
             connect();
 
-//            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Campus WHERE Campus_name=?");
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Campus");
-//            statement.setString(1,entry);
+            if (all) statement = conn.prepareStatement("SELECT * FROM Campus");
+            else {
+                statement = conn.prepareStatement("SELECT * FROM Campus WHERE Campus_name=?");
+                statement.setString(1, entry);
+            }
             ResultSet rs = statement.executeQuery();
             System.out.printf("%s | %s | %s\n","Campus_name", "State", "City");
             System.out.println("--------------------------------");
             while (rs.next()) {
                 System.out.printf("%-11s | %5s | %5s\n", rs.getString("Campus_name"), rs.getString("State"), rs.getString("City"));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    protected void selectBuildingType(String entry, boolean test) {
+    protected void selectBuildingType(String entry, boolean all) {
         PreparedStatement statement;
         try {
             connect();
-            if (test) {
-//                statement = conn.prepareStatement("SELECT * FROM Building_type WHERE typeID=?");
+            if (all) {
                 statement = conn.prepareStatement("SELECT * FROM Building_type");
-//                int id = Integer.parseInt(entry);
-//                statement.setInt(1,id);
+
             } else {
-//                statement = conn.prepareStatement("SELECT * FROM Building_type WHERE type_name=?");
-                statement = conn.prepareStatement("SELECT * FROM Building_type");
-//                statement.setString(1,entry);
+                statement = conn.prepareStatement("SELECT * FROM Building_type WHERE type_name=?");
+                statement.setString(1,entry);
             }
             ResultSet rs = statement.executeQuery();
 
@@ -120,20 +120,26 @@ public class DB {
             while (rs.next()) {
                 System.out.printf("%-6d | %9s\n", rs.getInt("typeID"), rs.getString("type_name"));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    protected void selectBuilding(String entry) {
+    protected void selectBuilding(String entry, boolean all, boolean id) {
+        PreparedStatement ps;
         try {
             connect();
-//            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Building WHERE Building_name=?");
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM Building");
-//            statement.setString(1,entry);
-            ResultSet rs = statement.executeQuery();
+            if (all)
+                ps = conn.prepareStatement("SELECT * FROM Building");
+            else if (id) {
+                ps = conn.prepareStatement("SELECT * FROM Building WHERE Building_id=?");
+                ps.setString(1, entry);
+            }
+            else {
+                ps = conn.prepareStatement("SELECT * FROM Building WHERE Building_name=?");
+                ps.setString(1, entry);
+            }
+            ResultSet rs = ps.executeQuery();
             System.out.printf("%s | %8s | %s | %s | %3s | %s\n", "Building_id", "Cost", "Capacity", "Location_id","Building_name", "typeID");
             System.out.println("------------------------------------------------------------------------");
             while (rs.next()) {
@@ -145,9 +151,7 @@ public class DB {
                 int typeID = rs.getInt("typeID");
                 System.out.printf("%-11d | %8d | %8d | %11d | %13s | %6d\n", Bid,cost, cap,Lid,bulding,typeID);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -173,35 +177,36 @@ public class DB {
         }
     }
 
-    public static void main(String[] args) {
-        DB db = new DB();
-
-        System.out.println("TESTING JOIN");
-        System.out.println("*************************");
-        db.join();
-        System.out.println();
-        System.out.println("TESTING SELECT BUILDING");
-        System.out.println("*************************");
-        db.selectBuilding("");
-        System.out.println();
-        System.out.println("TESTING AVG");
-        System.out.println("*************************");
-        db.avg();
-        System.out.println();
-        System.out.println("TESTING SELECT CAMPUS");
-        System.out.println("*************************");
-        db.selectCampus("");
-        System.out.println();
-        System.out.println("TESTING SELECT LOCATION");
-        System.out.println("*************************");
-        db.selectLocation(1);
-        System.out.println();
-        System.out.println("TESTING SELECT PARKING");
-        System.out.println("*************************");
-        db.selectParking("");
-        System.out.println();
-        System.out.println("TESTING SELECT BUILDING TYPE");
-        System.out.println("*************************");
-        db.selectBuildingType("",true);
-    }
+//    protected
+//    public static void main(String[] args) {
+//        DB db = new DB();
+//
+//        System.out.println("TESTING JOIN");
+//        System.out.println("*************************");
+//        db.join();
+//        System.out.println();
+//        System.out.println("TESTING SELECT BUILDING");
+//        System.out.println("*************************");
+//        db.selectBuilding("");
+//        System.out.println();
+//        System.out.println("TESTING AVG");
+//        System.out.println("*************************");
+//        db.avg();
+//        System.out.println();
+//        System.out.println("TESTING SELECT CAMPUS");
+//        System.out.println("*************************");
+//        db.selectCampus("");
+//        System.out.println();
+//        System.out.println("TESTING SELECT LOCATION");
+//        System.out.println("*************************");
+//        db.selectLocation(1);
+//        System.out.println();
+//        System.out.println("TESTING SELECT PARKING");
+//        System.out.println("*************************");
+//        db.selectParking("");
+//        System.out.println();
+//        System.out.println("TESTING SELECT BUILDING TYPE");
+//        System.out.println("*************************");
+//        db.selectBuildingType("",true);
+//    }
 }
