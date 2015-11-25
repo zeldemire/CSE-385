@@ -17,7 +17,7 @@ public class DB {
     public void connect() throws IOException {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(dbURL,user,pwd);
+            conn = DriverManager.getConnection(dbURL, user, pwd);
 
         } catch (Exception err) {
             throw new IOException(err);
@@ -49,7 +49,7 @@ public class DB {
             if (all) statement = conn.prepareStatement("SELECT * FROM Parking");
             else {
                 statement = conn.prepareStatement("SELECT * FROM Parking WHERE Pass_type=?");
-                statement.setString(1,entry);
+                statement.setString(1, entry);
             }
             ResultSet rs = statement.executeQuery();
             System.out.printf("%-19s | %s | %s | %s\n", "Parking_name", "Parking_spots", "Location_id", "Pass_type");
@@ -62,13 +62,17 @@ public class DB {
         }
     }
 
-    protected void selectLocation(int entry, boolean all) {
+    protected void selectLocation(String entry, boolean all, boolean address) {
         PreparedStatement statement;
         try {
             connect();
             if (all) statement = conn.prepareStatement("SELECT * FROM Location");
-            else {statement = conn.prepareStatement("SELECT * FROM Location WHERE Location_id=?");
-                statement.setInt(1,entry);
+            else if (address) {
+                statement = conn.prepareStatement("SELECT * FROM Location WHERE Address=?");
+                statement.setString(1, entry);
+            } else {
+                statement = conn.prepareStatement("SELECT * FROM Location WHERE Location_id=?");
+                statement.setString(1, entry);
             }
             ResultSet rs = statement.executeQuery();
             System.out.printf("%s | %-22s | %s | %s | %s\n", "Location_id", "Address", "Campus_name", "Quad_name", "Grid_number");
@@ -92,7 +96,7 @@ public class DB {
                 statement.setString(1, entry);
             }
             ResultSet rs = statement.executeQuery();
-            System.out.printf("%s | %s | %s\n","Campus_name", "State", "City");
+            System.out.printf("%s | %s | %s\n", "Campus_name", "State", "City");
             System.out.println("--------------------------------");
             while (rs.next()) {
                 System.out.printf("%-11s | %5s | %5s\n", rs.getString("Campus_name"), rs.getString("State"), rs.getString("City"));
@@ -111,7 +115,7 @@ public class DB {
 
             } else {
                 statement = conn.prepareStatement("SELECT * FROM Building_type WHERE type_name=?");
-                statement.setString(1,entry);
+                statement.setString(1, entry);
             }
             ResultSet rs = statement.executeQuery();
 
@@ -134,13 +138,12 @@ public class DB {
             else if (id) {
                 ps = conn.prepareStatement("SELECT * FROM Building WHERE Building_id=?");
                 ps.setString(1, entry);
-            }
-            else {
+            } else {
                 ps = conn.prepareStatement("SELECT * FROM Building WHERE Building_name=?");
                 ps.setString(1, entry);
             }
             ResultSet rs = ps.executeQuery();
-            System.out.printf("%s | %8s | %s | %s | %3s | %s\n", "Building_id", "Cost", "Capacity", "Location_id","Building_name", "typeID");
+            System.out.printf("%s | %8s | %s | %s | %3s | %s\n", "Building_id", "Cost", "Capacity", "Location_id", "Building_name", "typeID");
             System.out.println("------------------------------------------------------------------------");
             while (rs.next()) {
                 int Bid = rs.getInt("Building_id");
@@ -149,11 +152,27 @@ public class DB {
                 int Lid = rs.getInt("Location_id");
                 String bulding = rs.getString("Building_name");
                 int typeID = rs.getInt("typeID");
-                System.out.printf("%-11d | %8d | %8d | %11d | %13s | %6d\n", Bid,cost, cap,Lid,bulding,typeID);
+                System.out.printf("%-11d | %8d | %8d | %11d | %13s | %6d\n", Bid, cost, cap, Lid, bulding, typeID);
             }
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    protected int selectLocIDByAddress(String entry) {
+        PreparedStatement statement;
+        try {
+            connect();
+            statement = conn.prepareStatement("SELECT Location_id FROM Location WHERE Address=?");
+            statement.setString(1, entry);
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) return rs.getInt("Location_id");
+            else return -1;
+        } catch (IOException | SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     protected void join() {
@@ -170,43 +189,21 @@ public class DB {
                 String state = resultSet.getString("State");
                 System.out.printf("%-22s | %5s | %5s\n", address, city, state);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
 
-//    protected
-//    public static void main(String[] args) {
-//        DB db = new DB();
-//
-//        System.out.println("TESTING JOIN");
-//        System.out.println("*************************");
-//        db.join();
-//        System.out.println();
-//        System.out.println("TESTING SELECT BUILDING");
-//        System.out.println("*************************");
-//        db.selectBuilding("");
-//        System.out.println();
-//        System.out.println("TESTING AVG");
-//        System.out.println("*************************");
-//        db.avg();
-//        System.out.println();
-//        System.out.println("TESTING SELECT CAMPUS");
-//        System.out.println("*************************");
-//        db.selectCampus("");
-//        System.out.println();
-//        System.out.println("TESTING SELECT LOCATION");
-//        System.out.println("*************************");
-//        db.selectLocation(1);
-//        System.out.println();
-//        System.out.println("TESTING SELECT PARKING");
-//        System.out.println("*************************");
-//        db.selectParking("");
-//        System.out.println();
-//        System.out.println("TESTING SELECT BUILDING TYPE");
-//        System.out.println("*************************");
-//        db.selectBuildingType("",true);
-//    }
+    protected boolean updateField(String entry, String oldname) {
+        PreparedStatement ps;
+
+        try {
+            connect();
+            ps = conn.prepareStatement("UPDATE Field SET Field_name=? WHERE Field_name=?");
+            ps.setString(1, entry);
+            ps.setString(2, oldname);
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
