@@ -11,6 +11,8 @@ public class Question {
 
     public static Scanner in = new Scanner(System.in);
     private static DB db = new DB();
+    public static String password;
+    public static String username;
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Miami University Building Database!");
@@ -18,20 +20,22 @@ public class Question {
     }
 
     /**
-     * This is the start point for the questions. It handles whether the user wants to update the database or search it.
+     * This is the start point for the questions. It handles whether the user wants to edit the database or search it.
      * The user can input exit to exit the program.
      */
     private static void handleInput() {
         String input;
-        System.out.println("What would you like to do. (Type search to search the database, update to update the database, or exit to leave the program.)");
+        System.out.println("What would you like to do. (Type search to search the database, update to edit the database," +
+                " or exit to leave the program.)");
         input = fixInput(in.nextLine());
 
         switch (input) {
             case "search":
                 searchDB();
                 break;
-            case "update":
-                updateDB();
+            case "edit":
+                login();
+                //editDB();
                 break;
             case "exit":
                 return;
@@ -41,13 +45,25 @@ public class Question {
         }
     }
 
+    private static void login() {
+        System.out.print("Username: ");
+        username = in.nextLine();
+        System.out.print("Password: ");
+        password = in.nextLine();
+        Login login = new Login(password, username);
+        if (!login.test()) {
+            System.out.println("Can't connect to database, another user is editing.");
+            handleInput();
+        } else editDB();
+    }
+
     /**
      * This method handles what the user wants to search for.
      */
     private static void searchDB() {
         System.out.println("Please enter the type of search you would like to do: " +
                 "(Building name, building id, building type, campus, location id, parking pass type, building average cost, " +
-                "full address, or quit to return to previous question)");
+                "full address, field, or quit to return to previous question)");
         String searchInput = fixInput(in.nextLine());
         switch (searchInput) {
             case "buildingname":
@@ -74,6 +90,9 @@ public class Question {
             case "fulladdress":
                 searchBuildingFullAddress();
                 break;
+            case "field":
+                searchField();
+                break;
             case "quit":
                 handleInput();
                 break;
@@ -85,17 +104,33 @@ public class Question {
     }
 
     /**
+     * Searches the database for the given field id, or returns the whole table if the user inputs all.
+     */
+    private static void searchField() {
+        System.out.println("Please enter a field location id to search for or type all to return a list of all fields in database.");
+        String fieldInput = fixInput(in.nextLine());
+
+        if (fieldInput.equals("all")) db.selectField(-1, true);
+        else db.selectField(Integer.parseInt(fieldInput), false);
+
+        System.out.println("If you want to search for another field type yes, if you want to go to the previous menu type no");
+        String cont = in.nextLine();
+        if (cont.equalsIgnoreCase("yes")) searchField();
+        else searchDB();
+    }
+
+    /**
      * Searches the database for the given building name, or returns the whole building table if the user inputs all.
      */
     private static void searchBuildingName() {
         System.out.println("Please enter a building name to search for or type all to return a list of all buildings in database.");
         String buildingInput = fixInput(in.nextLine());
-        if (buildingInput.equals("all")) db.selectBuilding("", true, false);
+        if (buildingInput.equalsIgnoreCase("all")) db.selectBuilding("", true, false);
         else db.selectBuilding(buildingInput, false, false);
 
         System.out.println("If you want to search for another building type yes, if you want to go to the previous menu type no");
         String cont = in.nextLine();
-        if (cont.equals("yes")) searchBuildingName();
+        if (cont.equalsIgnoreCase("yes")) searchBuildingName();
         else searchDB();
     }
 
@@ -110,7 +145,7 @@ public class Question {
 
         System.out.println("If you want to search for another building type yes, if you want to go to the previous menu type no");
         String cont = in.nextLine();
-        if (cont.equals("yes")) searchBuildingId();
+        if (cont.equalsIgnoreCase("yes")) searchBuildingId();
         else searchDB();
     }
 
@@ -125,7 +160,7 @@ public class Question {
 
         System.out.println("If you  want to search for a different building type type yes, if you want to return to the previous menu type no");
         String cont = in.nextLine();
-        if (cont.equals("yes")) searchBuildingType();
+        if (cont.equalsIgnoreCase("yes")) searchBuildingType();
         else searchDB();
     }
 
@@ -140,7 +175,7 @@ public class Question {
 
         System.out.println("If you want to search for another campus type yes, type no to return to previous menu");
         String cont = in.nextLine();
-        if (cont.equals("yes")) searchCampus();
+        if (cont.equalsIgnoreCase("yes")) searchCampus();
         else searchDB();
     }
 
@@ -155,7 +190,7 @@ public class Question {
 
         System.out.println("If you want to search for another location by id type yes, type no to return to previous menu.");
         String cont = in.nextLine();
-        if (cont.equals("yes")) searchLocationNumber();
+        if (cont.equalsIgnoreCase("yes")) searchLocationNumber();
         else searchDB();
     }
 
@@ -171,7 +206,7 @@ public class Question {
         System.out.println("If you would like to continue searching for parking location by parking pass type yes, if not" +
                 " type no");
         String cont = in.nextLine();
-        if (cont.equals("yes")) searchPassColor();
+        if (cont.equalsIgnoreCase("yes")) searchPassColor();
         else searchDB();
     }
 
@@ -183,7 +218,7 @@ public class Question {
         db.avg();
         System.out.println("To make another search type yes, or no to return to main menu.");
         String cont = in.nextLine();
-        if (cont.equals("yes")) searchDB();
+        if (cont.equalsIgnoreCase("yes")) searchDB();
         else handleInput();
     }
 
@@ -203,66 +238,114 @@ public class Question {
 
         System.out.println("If you would like to search for another building type yes, if not type no");
         String cont = in.nextLine();
-        if (cont.equals("yes")) searchBuildingFullAddress();
+        if (cont.equalsIgnoreCase("yes")) searchBuildingFullAddress();
         else searchDB();
     }
 
-    private static void updateDB(){
-        System.out.println("Please enter the table you would like to update. (Building, Building type, Campus, Field, Location, or Parking)");
-        String updateInput = fixInput(in.nextLine());
-        switch (updateInput) {
-            case "parking":
-                updateParking();
+    /**
+     * This function handles the admin input from the user.
+     */
+    private static void editDB(){
+        System.out.println("Please enter the statement that you want to execute. Type help to see the usage. Or exit to " +
+                "return the main menu.");
+        String updateInput = in.nextLine();
+        if (updateInput.equalsIgnoreCase("help")) help();
+        else if (updateInput.equalsIgnoreCase("select everything")) selectEverything();
+        else if (updateInput.equalsIgnoreCase("show table names")) showTableNames();
+        else if (updateInput.equalsIgnoreCase("select table")) selectTable();
+        else if (updateInput.equalsIgnoreCase("exit")) {
+            Login login = new Login(password, username);
+            login.exit();
+            handleInput();
+        }
+        else updateDB(updateInput);
+    }
+
+    /**
+     * Handles the selection for which table to search
+     */
+    private static void selectTable() {
+        System.out.print("Which table: ");
+        String tableName = in.nextLine();
+        switch (tableName.toLowerCase()) {
+            case "building":
+                db.selectBuilding("", true, false);
                 break;
             case "location":
-                updateLocation();
-                break;
-            case "campus":
-                updateCampus();
-                break;
-            case "building":
-                updateBuilding();
-                break;
-            case "buildingtype":
-                updateBuildingType();
+                db.selectLocation("", true, false);
                 break;
             case "field":
-                updateField();
+                db.selectField(-1,true);
+                break;
+            case "campus":
+                db.selectCampus("", true);
+                break;
+            case "parking":
+                db.selectParking("", true);
+                break;
+            case "building type":
+                db.selectBuildingType("", true);
                 break;
             default:
-                System.out.println("You entered something that was not supported, please try again.");
+                selectTable();
                 break;
         }
+        editDB();
     }
 
-    private static void updateField() {
-
+    /**
+     * This function will show all of the table names currently in the database.
+     */
+    private static void showTableNames() {
+        DB db = new DB();
+        db.showTableNames();
+        editDB();
     }
 
-    private static void updateBuildingType() {
-
+    /**
+     * This function will return every table in the database.
+     */
+    private static void selectEverything() {
+        DB db = new DB();
+        System.out.println("Building Table");
+        db.selectBuilding("", true, false);
+        System.out.println("Campus Table");
+        db.selectCampus("", true);
+        System.out.println("Building_type Table");
+        db.selectBuildingType("", true);
+        System.out.println("Location Table");
+        db.selectLocation("", true, false);
+        System.out.println("Parking Table");
+        db.selectParking("", true);
+        System.out.println("Field");
+        db.selectField(-1, true);
+        editDB();
     }
 
-    private static void updateBuilding() {
+    /**
+     * This function will take the sql statements and run them.
+     * @param updateInput the sql statement from the user.
+     */
+    private static void updateDB(String updateInput) {
+        DB db = new DB();
 
+        if (db.update(updateInput)) {
+            System.out.println("Edit has been applied");
+        }
+        editDB();
     }
 
-    private static void updateCampus() {
 
+    /**
+     * Returns the usage of the program.
+     */
+    private static void help() {
+        System.out.println("Usage: Type Select everything to show each table.");
+        System.out.println("Type show table names to get the table names.");
+        System.out.println("Or type select <TABLE NAME> to select all from that table.");
+        System.out.println("Or just type the sql statements in.");
+        editDB();
     }
 
-    private static void updateLocation() {
-
-    }
-
-    private static void updateParking() {
-
-    }
-
-    private static String fixInput(String input) {
-        return input.replaceAll("\\s","").toLowerCase(); }
-
-
-
-
+    private static String fixInput(String input) { return input.replaceAll("\\s","").toLowerCase(); }
 }

@@ -33,9 +33,9 @@ public class DB {
             System.out.println("AVG(Cost)");
             System.out.println("---------");
             while (rs.next()) {
-
                 System.out.printf("%-9d\n", rs.getInt("AVG(Cost)"));
             }
+            System.out.println("---------");
         } catch (Exception err) {
             err.printStackTrace();
         }
@@ -57,6 +57,7 @@ public class DB {
             while (rs.next()) {
                 System.out.printf("%-19s | %13d | %11d | %9s\n", rs.getString("Parking_name"), rs.getInt("Parking_spots"), rs.getInt("Location_id"), rs.getString("Pass_type"));
             }
+            System.out.println("-------------------------------------------------------------");
         } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
@@ -75,16 +76,38 @@ public class DB {
                 statement.setString(1, entry);
             }
             ResultSet rs = statement.executeQuery();
-            System.out.printf("%s | %-22s | %s | %s | %s\n", "Location_id", "Address", "Campus_name", "Quad_name", "Grid_number");
+            System.out.printf("%s | %22s | %s | %s | %s\n", "Location_id", "Address", "Campus_name", "Quad_name", "Grid_number");
             System.out.println("----------------------------------------------------------------------------");
             while (rs.next()) {
                 System.out.printf("%-11d | %22s | %11s | %9s | %11s\n", rs.getInt("Location_id"), rs.getString("Address"), rs.getString("Campus_name"), rs.getString("Quad_name"), rs.getString("Grid_number"));
             }
+            System.out.println("----------------------------------------------------------------------------");
         } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }
 
+    protected void selectField(int entry, boolean all) {
+        PreparedStatement preparedStatement;
+        try {
+            connect();
+            if (all) preparedStatement = conn.prepareStatement("SELECT * FROM Field");
+            else {
+                preparedStatement = conn.prepareStatement("SELECT * FROM Field WHERE Location_id=?");
+                preparedStatement.setInt(1, entry);
+            }
+            ResultSet rs = preparedStatement.executeQuery();
+            System.out.printf("%s | %s | %-13s\n","Field_name", "Location_id", "Field_uses");
+            System.out.println("----------------------------------------");
+            while (rs.next()) {
+                System.out.printf("%10s | %11d | %s\n", rs.getString("Field_name"), rs.getInt("Location_id"), rs.getString("Field_uses"));
+            }
+            System.out.println("----------------------------------------");
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
     protected void selectCampus(String entry, boolean all) {
         PreparedStatement statement;
         try {
@@ -101,6 +124,7 @@ public class DB {
             while (rs.next()) {
                 System.out.printf("%-11s | %5s | %5s\n", rs.getString("Campus_name"), rs.getString("State"), rs.getString("City"));
             }
+            System.out.println("--------------------------------");
         } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
@@ -124,6 +148,7 @@ public class DB {
             while (rs.next()) {
                 System.out.printf("%-6d | %9s\n", rs.getInt("typeID"), rs.getString("type_name"));
             }
+            System.out.println("------------------");
         } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
@@ -154,6 +179,7 @@ public class DB {
                 int typeID = rs.getInt("typeID");
                 System.out.printf("%-11d | %8d | %8d | %11d | %13s | %6d\n", Bid, cost, cap, Lid, bulding, typeID);
             }
+            System.out.println("------------------------------------------------------------------------");
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -194,16 +220,35 @@ public class DB {
         }
     }
 
-    protected boolean updateField(String entry, String oldname) {
-        PreparedStatement ps;
-
+    protected void showTableNames() {
         try {
             connect();
-            ps = conn.prepareStatement("UPDATE Field SET Field_name=? WHERE Field_name=?");
-            ps.setString(1, entry);
-            ps.setString(2, oldname);
+            DatabaseMetaData databaseMetaData = conn.getMetaData();
+            ResultSet rs1 = databaseMetaData.getTables(null, null, null, new String[]{"TABLE"});
+            while (rs1.next())
+            {
+                System.out.print(rs1.getString(3) + " | ");
+            }
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+
+    }
+    protected boolean update(String sql) {
+        try {
+            connect();
+            Statement stmt = conn.createStatement();
+            stmt.execute(sql);
+            stmt.close();
+            return true;
+        } catch (SQLException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        DB db = new DB();
+        db.selectField(0,true);
     }
 }
