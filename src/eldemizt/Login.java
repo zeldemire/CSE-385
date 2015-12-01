@@ -13,8 +13,8 @@ import java.sql.*;
 public class Login {
     private final String username;
     private final String password;
-    String user = "root";
-    String pwd = "Theblood5";
+    String user = info.username;
+    String pwd = info.password;
     String dbURL = "jdbc:mysql://localhost:3306/Project";
     Connection conn = null;
 

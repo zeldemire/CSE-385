@@ -9,8 +9,8 @@ import java.sql.*;
  * CSE 385
  */
 public class DB {
-    String user = "root";
-    String pwd = "Theblood5";
+    String user = info.username;
+    String pwd = info.password;
     String dbURL = "jdbc:mysql://localhost:3306/Project";
     Connection conn = null;
 
@@ -108,6 +108,7 @@ public class DB {
             e.printStackTrace();
         }
     }
+
     protected void selectCampus(String entry, boolean all) {
         PreparedStatement statement;
         try {
@@ -234,6 +235,7 @@ public class DB {
         }
 
     }
+
     protected boolean update(String sql) {
         try {
             connect();
@@ -247,8 +249,4 @@ public class DB {
         return false;
     }
 
-    public static void main(String[] args) {
-        DB db = new DB();
-        db.selectField(0,true);
-    }
 }

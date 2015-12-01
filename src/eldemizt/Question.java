@@ -35,7 +35,6 @@ public class Question {
                 break;
             case "edit":
                 login();
-                //editDB();
                 break;
             case "exit":
                 return;
@@ -63,7 +62,7 @@ public class Question {
     private static void searchDB() {
         System.out.println("Please enter the type of search you would like to do: " +
                 "(Building name, building id, building type, campus, location id, parking pass type, building average cost, " +
-                "full address, field, or quit to return to previous question)");
+                "full address, field, join, or quit to return to previous question)");
         String searchInput = fixInput(in.nextLine());
         switch (searchInput) {
             case "buildingname":
@@ -92,6 +91,10 @@ public class Question {
                 break;
             case "field":
                 searchField();
+                break;
+            case "join":
+                db.join();
+                handleInput();
                 break;
             case "quit":
                 handleInput();
@@ -342,10 +345,17 @@ public class Question {
     private static void help() {
         System.out.println("Usage: Type Select everything to show each table.");
         System.out.println("Type show table names to get the table names.");
-        System.out.println("Or type select <TABLE NAME> to select all from that table.");
+        System.out.println("Or type select table to bring up and option to select tables that are in the database.");
         System.out.println("Or just type the sql statements in.");
         editDB();
     }
 
-    private static String fixInput(String input) { return input.replaceAll("\\s","").toLowerCase(); }
+    /**
+     * Fixes the input string.
+      * @param input The string from the user.
+     * @return the string without spaces and in lowercase
+     */
+    private static String fixInput(String input) {
+        return input.replaceAll("\\s","").toLowerCase();
+    }
 }
