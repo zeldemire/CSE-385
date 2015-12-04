@@ -8,19 +8,18 @@ import java.sql.*;
 /**
  * Created by Zach Eldemire on 11/30/15.
  * Project
- * CSE 383
+ * CSE 385
+ * This class handles all of the admin login logic.
  */
 public class Login {
-    private final String username;
     private final String password;
     String user = info.username;
     String pwd = info.password;
     String dbURL = "jdbc:mysql://localhost:3306/Project";
     Connection conn = null;
 
-    public Login(String password, String username) {
+    public Login(String password) {
         this.password = password;
-        this.username = username;
         try {
             connect();
         } catch (IOException e) {
@@ -88,6 +87,7 @@ public class Login {
                 ps.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
+                return false;
             }
             return true;
         }
@@ -134,12 +134,5 @@ public class Login {
             e.printStackTrace();
         }
         return generatedPassword;
-    }
-
-    public static void main(String[] args) throws SQLException, InterruptedException {
-        Login login = new Login("admin", "admin");
-        //System.out.println(login.test());
-        Thread.sleep(100);
-        login.exit();
     }
 }

@@ -3,7 +3,7 @@ package eldemizt;
 /**
  * Created by Zach Eldemire on 12/1/15.
  * Project
- * CSE 383
+ * CSE 385
  */
 public class info {
     public static final String username = "root";

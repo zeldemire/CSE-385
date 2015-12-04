@@ -5,14 +5,14 @@ import java.util.Scanner;
 /**
  * Created by Zach Eldemire on 11/24/15.
  * Project
- * CSE 383
+ * CSE 385
+ * This class handles all of interactions the program has with the user.
  */
 public class Question {
 
     public static Scanner in = new Scanner(System.in);
     private static DB db = new DB();
-    public static String password;
-    public static String username;
+    public static String password, username;
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Miami University Building Database!");
@@ -49,7 +49,7 @@ public class Question {
         username = in.nextLine();
         System.out.print("Password: ");
         password = in.nextLine();
-        Login login = new Login(password, username);
+        Login login = new Login(password);
         if (!login.test()) {
             System.out.println("Can't connect to database, another user is editing.");
             handleInput();
@@ -257,7 +257,7 @@ public class Question {
         else if (updateInput.equalsIgnoreCase("show table names")) showTableNames();
         else if (updateInput.equalsIgnoreCase("select table")) selectTable();
         else if (updateInput.equalsIgnoreCase("exit")) {
-            Login login = new Login(password, username);
+            Login login = new Login(password);
             login.exit();
             handleInput();
         }

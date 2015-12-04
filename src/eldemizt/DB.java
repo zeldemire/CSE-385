@@ -7,6 +7,7 @@ import java.sql.*;
  * Created by Zach Eldemire on 11/17/15.
  * Project
  * CSE 385
+ * This class handles all of the database interactions.
  */
 public class DB {
     String user = info.username;
@@ -24,6 +25,9 @@ public class DB {
         }
     }
 
+    /**
+     * Computes the average building cost.
+     */
     protected void avg() {
         try {
             connect();
@@ -41,6 +45,11 @@ public class DB {
         }
     }
 
+    /**
+     * Selects information from the parking table.
+     * @param entry pass type to search for.
+     * @param all true if user wants to return everything in table, false if they want to search for just the pass type.
+     */
     protected void selectParking(String entry, boolean all) {
         PreparedStatement statement;
         try {
@@ -63,6 +72,12 @@ public class DB {
         }
     }
 
+    /**
+     * Selects information from the location table.
+     * @param entry either the address or the location id depends on the address boolean.
+     * @param all true to show everything in table, false to just show selected field.
+     * @param address true if the user wants to search using the address, false for location id.
+     */
     protected void selectLocation(String entry, boolean all, boolean address) {
         PreparedStatement statement;
         try {
@@ -87,6 +102,11 @@ public class DB {
         }
     }
 
+    /**
+     * Selects information from the field table.
+     * @param entry location id of the field.
+     * @param all returns all of the information from the table.
+     */
     protected void selectField(int entry, boolean all) {
         PreparedStatement preparedStatement;
         try {
@@ -109,6 +129,11 @@ public class DB {
         }
     }
 
+    /**
+     * Selects information from the campus table.
+     * @param entry the campus name.
+     * @param all returns all of the information from the table.
+     */
     protected void selectCampus(String entry, boolean all) {
         PreparedStatement statement;
         try {
@@ -131,6 +156,11 @@ public class DB {
         }
     }
 
+    /**
+     * Selects information from the building type table.
+     * @param entry the type name of the building.
+     * @param all returns all of the information from the table.
+     */
     protected void selectBuildingType(String entry, boolean all) {
         PreparedStatement statement;
         try {
@@ -155,6 +185,12 @@ public class DB {
         }
     }
 
+    /**
+     * Selects information from the building table.
+     * @param entry either the building id or the building name.
+     * @param all returns all of the information from the table.
+     * @param id changes the query to search for buildings using the id.
+     */
     protected void selectBuilding(String entry, boolean all, boolean id) {
         PreparedStatement ps;
         try {
@@ -186,6 +222,11 @@ public class DB {
         }
     }
 
+    /**
+     * Selects information from the location table.
+     * @param entry address to search for
+     * @return the location id to the address
+     */
     protected int selectLocIDByAddress(String entry) {
         PreparedStatement statement;
         try {
@@ -202,6 +243,9 @@ public class DB {
         return -1;
     }
 
+    /**
+     * Joins the campus table with the location table on the campus name.
+     */
     protected void join() {
         try {
             connect();
@@ -221,6 +265,9 @@ public class DB {
         }
     }
 
+    /**
+     * Shows all of the table names in the database.
+     */
     protected void showTableNames() {
         try {
             connect();
@@ -230,12 +277,18 @@ public class DB {
             {
                 System.out.print(rs1.getString(3) + " | ");
             }
+            System.out.println();
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
     }
 
+    /**
+     * Runs the provided sql statement.
+     * @param sql the users sql statement
+     * @return true if everything wen ok, false if it didn't.
+     */
     protected boolean update(String sql) {
         try {
             connect();

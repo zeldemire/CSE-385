@@ -1,0 +1,56 @@
+I was not able to include the database file with the project but I will include a snapshot of what is in our database.
+Building Table
+Building_id |     Cost | Capacity | Location_id | Building_name | typeID
+------------------------------------------------------------------------
+1           |   500000 |      200 |           1 |        Dorsey |      2
+2           |  8900000 |     2000 |           2 |        Benton |      0
+3           |   400000 |      300 |           3 |      Anderson |      2
+4           |  1700000 |      200 |           4 |          Laws |      0
+5           |  7500000 |     9200 |           5 |       Millett |      1
+6           | 13500000 |    24286 |           6 |         Yager |      1
+7           |  1278000 |      500 |          11 |        Harris |      3
+8           |  6103444 |      200 |          12 |    Bell Tower |      3
+------------------------------------------------------------------------
+Campus Table
+Campus_name | State | City
+--------------------------------
+Hamilton    |  Ohio | Hamilton
+Oxford      |  Ohio | Oxford
+--------------------------------
+Building_type Table
+typeID | type_name
+------------------
+0      |  Academic
+1      |  Athletic
+2      |      Dorm
+3      |    Dining
+4      |   Parking
+------------------
+Location Table
+Location_id |                Address | Campus_name | Quad_name | Grid_number
+----------------------------------------------------------------------------
+1           |          300 E High st |      Oxford |      East |         F-5
+2           |          510 E High st |      Oxford |  Academic |         F-3
+3           |              701 S Oak |      Oxford |     South |         B-2
+4           |          551 E High st |      Oxford |  Academic |         F-3
+5           |      500 E Sycamore st |      Oxford |     North |         I-2
+6           |         5300 Bonham rd |      Oxford |     North |         J-3
+7           |    763 S Patterson Ave |      Oxford |     South |         C-4
+8           |          840 E High st |      Oxford |      East |         F-5
+9           | 4998 Oxford Trenton rd |      Oxford |      West |         D-6
+10          |           E Withrow st |      Oxford |     North |         G-3
+11          |          500 harris dr |      Oxford |     South |         B-2
+12          |          401 E High st |      Oxford |  Academic |         F-2
+----------------------------------------------------------------------------
+Parking Table
+Parking_name        | Parking_spots | Location_id | Pass_type
+-------------------------------------------------------------
+Ditmer              |           700 |           9 |    Yellow
+North Campus Garage |           250 |          10 |      Paid
+-------------------------------------------------------------
+Field
+Field_name | Location_id | Field_uses
+----------------------------------------
+      Cook |           8 | Intramural
+    Tappan |           7 | Marching Band
+----------------------------------------
